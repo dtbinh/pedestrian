@@ -1,0 +1,15 @@
+  trottoirs    ;; patchset containing the patches that are trottoirs
+  roads         ;; patchset containing the patches that are roads
+  buildings     ;; patchset containing the patches that are building's blocks
+ 
+ inout        ;;  patchset sur lesquels de nouveaux piétons peuvent apparaître
+ 
+à grouper
+ zebra        ;;patchset containing zebras
+  izebra      ;;patchset containing illegal zebras
+  lights
+
+bitmap:copy-to-pcolors
+bitmap:copy-to-pcolors image boolean
+
+Imports the given image into the pcolors, scaled to fit the world. The second input indicates whether the colors should be interpreted as NetLogo colors or left as RGB colors. false means RGB colors. 
