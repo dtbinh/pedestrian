@@ -152,7 +152,8 @@ to initialize
   set NORTH 2
   
   ask patches [set proba -1]
-  initializeLedru
+  if(env = "ledru")[ initializeLedru ]
+  if(env = "bmp")[ initializeBmp ]
   setup-coor
 end
 
@@ -167,7 +168,7 @@ end
 ;; 
 to initializeLedru
   
-  set echelle 5  ;;echelle approximative pour passer des mesures en cm sur le papier au m de la réalit. 1 patch = 1m
+  set echelle 5  ;;echelle approximative pour passer des mesures en cm sur le papier au m de la réalité. 1 patch = 1m
   set z-size 0.8 * echelle
   
   set t [.9 1.1 .9 .9 1 1 1 .9 ] ;;largeur appro des 8 troittoires
@@ -192,6 +193,15 @@ to initializeLedru
   
 end
 
+extensions[ bitmap ]
+
+to initializeBmp
+
+ let bg bitmap:import "../data/t1.bmp"
+ show bitmap:height bg
+ set bg bitmap:scaled bg 80 80
+ bitmap:copy-to-pcolors bg TRUE
+end
 
 ;; Make the patches have appropriate colors, set up the roads and intersections agentsets,
 ;; and initialize the traffic lights to one setting
