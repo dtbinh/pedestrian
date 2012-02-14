@@ -28,7 +28,7 @@ globals
   zx1        ;; coordonnées des zebra pietons
   zx2        ;; ---
   zy1        ;; ---
-  zy2        ;; ---
+  zy2        ;; ---goal
 
   izx1        ;; cordinates of illegals zebra 
   izx2        ;; ---
@@ -63,7 +63,7 @@ globals
   EAST         ;; identifiant du passage pietons à l'EST
   WEST         ;; identifiant du passage pietons à l'OUEST
   NORTH        ;; identifiant du passage pietons au NORD
-  
+
 ]
 
 turtles-own
@@ -73,6 +73,8 @@ turtles-own
   wait-time ;; the amount of time since the last time a turtle has moved
   goal      ;; id of the exit where the agent want to go
   quick
+  cross?    ;; tell whether or not the agent is crossing a zebra/izebra
+  lifetime  ;;
 ]
 
 
@@ -86,7 +88,7 @@ patches-own
   my-column       ;; the column of the intersection counting from the upper left corner of the
                   ;; world.  -1 for non-intersection patches.
   my-phase        ;; the phase for the intersection.  -1 for non-intersection patches.
-  auto?           ;; whether or not this intersection will switch automatically.
+  auto?           ;; whether or not this40 intersection will switch automatically.
                   ;; false for non-intersection patches.
   
   io-id           ;; inout identification number
@@ -105,7 +107,7 @@ patches-own
 
 ;;;;
 ;; initiailise certaines variables statiques comme les couleurs 
-;; certaines mesures statiques et fait appelle au procedure pour calculer les coordonnés en fonction de ces
+;; certaines mesures statiques et fait appelle aux procedures pour calculer les coordonnés en fonction de ces
 ;; mesures
 to initialize
   set bcolor brown
@@ -159,8 +161,8 @@ end
 ;; Cette fonction initialise les mesures necessaires 
 ;; au calcul des coordonnées des différent éléments du carrefour spécifiquemment pour 
 ;; le croisemment ledru rollin/Faubourg SA.
-;; c'est ici que sont déclarer les largeur des trottoirs, des routes, etc.. En fonction de mesures faites TRES
-;; approximativemment à partir du plan gracieusement imprimé par el service de l'urbanisme du XIieme arrondissement de Paris
+;; c'est ici que sont déclarées les largeurs des trottoirs, des routes, etc.. En fonction de mesures faites TRES
+;; approximativemment à partir du plan gracieusement imprimé par le service de l'urbanisme du XIe arrondissement de Paris
 ;;
 ;; 
 to initializeLedru
@@ -209,7 +211,7 @@ to setup-patches
     set allb ( replace-item ? allb ( getRect ( item ? bx1 ) (item ? by1) (item ? bx2) (item ? by2)) ) ;get block rectangle
     set allt ( replace-item ? allt ( getRect ( item ? tx1 ) (item ? ty1) (item ? tx2) (item ? ty2)) )
     ask item ? allt [ set pcolor tcolor set proba 100 ] ;draw trottoirs
-    ask item ? allb [ set pcolor bcolor set proba -1] ;draw block rectangle
+    ask item ? allb [ set pcolor bcolor set proba -1 ] ;draw block rectangle
     
   ]
   
@@ -313,10 +315,10 @@ to buildings-coor
   ]
 end
 
-;Initialise les troittoires en fonction des cordonnées des blocks
-;et du vecteur t dans lequel sont stocké tout les longeurs de trottoirs
+;Initialise les trottoirs en fonction des cordonnées des blocks
+;et du vecteur t dans lequel sont stockés toutes les longeurs des trottoirs
 ;;les trottoirs sont enfaites definis comme des carré de la taille des blocks qu'ils bordent
-;;plus la taille du troittoires en question (dependamment de la poistion du trottoire sa taille
+;;plus la taille du trottoirs en question (dependamment de la position du trottoir sa taille
 ;; sera ajoutée a la largeur ou à la hauteur du block)
 to trottoirs-coor
   
@@ -394,7 +396,7 @@ to zebra-coor
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;; Set illegal zebra- 
-  ;; !!LES AGRANDIR AU REBORD DES PLUS GRAND TROTTOIRE QUI LeS BORDES
+  ;; !!LES AGRANDIR AU REBORD DES PLUS GRANDS TROTTOIRES QUI LeS BORDENT
   
   
   set izx1 replace-item 0 izx1 (item 0 zx1)
@@ -564,21 +566,21 @@ to setup-inout
   
   ;;set inout define by the start of 
   set inout patches with [
-    pcolor = tcolor and (pxcor = max-pxcor or pxcor = min-pxcor or pycor = max-pycor or pycor = min-pycor )
+    pcolor = tcolor and (pxcor = max-pxcor - 1 or pxcor = min-pxcor + 1 or pycor = max-pycor - 1 or pycor = min-pycor + 1)
   ]
   ask inout [
     
-    if pycor = min-pycor and (pxcor <= item 0 tx2 ) [setio 0 ]
-    if pycor = min-pycor and (pxcor >= item 1 tx1 ) [setio 1 ]
+    if pycor = min-pycor + 1 and (pxcor <= (item 0 tx2) ) [setio 0 ]
+    if pycor = min-pycor + 1 and (pxcor >= (item 1 tx1) ) [setio 1 ]
     
-    if pxcor = max-pxcor and (pycor <= item 1 ty2 ) [setio 2 ]    
-    if pxcor = max-pxcor and (pycor >= item 2 ty1 ) [setio 3 ]
+    if pxcor = max-pxcor - 1 and (pycor <= item 1 ty2 ) [setio 2 ]    
+    if pxcor = max-pxcor - 1 and (pycor >= item 2 ty1 ) [setio 3 ]
     
-    if pycor = max-pycor and (pxcor >= item 2 tx1 ) [setio 4 ]
-    if pycor = max-pycor and (pxcor <= item 3 tx2 ) [setio 5 ]
+    if pycor = max-pycor - 1 and (pxcor >= item 2 tx1 ) [setio 4 ]
+    if pycor = max-pycor - 1 and (pxcor <= item 3 tx2 ) [setio 5 ]
     
-    if pxcor = min-pxcor and (pycor >= item 3 ty1 ) [setio 6 ]
-    if pxcor = min-pxcor and (pycor <= item 0 ty2 ) [setio 7 ]
+    if pxcor = min-pxcor + 1 and (pycor >= item 3 ty1 ) [setio 6 ]
+    if pxcor = min-pxcor + 1 and (pycor <= item 0 ty2 ) [setio 7 ]
     
     
   ]
@@ -645,11 +647,13 @@ to setup-agent
   
   ;set shape "person"
   move-to one-of inout
-  
+
+
   set goal random (max [io-id] of patches)
   set quick random 0
   set speed 1;set heading towardsxy [pxcor] of g [pycor] of g    ;; On oriente la direction de l'agent vers ce but
-  
+  set cross? FALSE;
+  face get-goal
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -759,7 +763,8 @@ to go
   ask lights [update-light] ;mets à jours les feux
   ask turtles [
     agent-behavior
-    
+    ifelse(Person)[ set shape "person"][set shape "arrow"] 
+    set lifetime (lifetime + 1)
   ]
   if (ticks mod pSpeed = 0) [crt pNb [ setup-agent ]] ;procedure de réaparition des agents
   
@@ -777,70 +782,80 @@ end
 ;;;;;;;;;
 ;How the agent reacts?
 to agent-behavior
-
-  let look patch-ahead 1 
+  if(lifetime > 100)[ set goal random (max [io-id] of patches)]
+  if ([io-id] of patch-at 0 0 = goal)[die report 1]
   
  
-  
-  
-;  show member? look trottoirs
-  set look patch-ahead 1    
-  if( look != nobody )[ ;;case when pedestrian reach a limit of the world
-    
-    ifelse(  not cross?)[ ;;si le pieton n'est pas déja entrain de traverser
+  face get-goal
+
+  let look patch-ahead 1    
+  ifelse( look != nobody )[ ;;case when pedestrian reach a limit of the world
+    if( [proba] of look = 100 )[ set cross? FALSE]    
+
+    if(not cross?)[ ;;si le pieton n'est pas déja entrain de traverser
       let p [proba] of look
       let z 0
       let al 0
       
-      ;    if(member? look trottoirs)[set proba proba + 100  ]
+      if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false]set cross? TRUE ]
       
-      if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false] ]
+      if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false]set cross? TRUE]
       
-      if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false] ]
-      
-      if(al != 0)[ if(one-of[state] of al = 2 )[set p (p * 2)]]
+      if(al != 0)[ if(one-of[state] of al = 2 )[set p (p * 100)]]
       
       let r (random 100 + 1) 
       
-      ifelse (r < p)[fd speed  face get-goal][
-        avoidIllegalPatch look ;fd speed
+      if(r > p)[ 
+        avoidIllegalPatch 
+        set cross? FALSE ;;unable to cross a ezbra/izebra
       ]
-      ;fd speed   
+      
     ]
-    [ fd speed ]
-    ;  face get-goal
-    if ([io-id] of patch-at 0 0 = goal)[die]
- ]
+    ;  
+    
+ ][avoidIllegalPatch]
+    fd speed 
+  
 end
 
 
-to avoidIllegalPatch[look]
-   let bool FALSE ;can i go strait?
-   let sens random 2 + 1
-  ifelse(look = nobody)[set bool TRUE][ set bool [proba] of patch-ahead 1 < 1];
-                                                                              ;  ifelse( heading  >= 90 and heading < 180 )
-;    [ ifelse(xcor <  0)[ set sens 1 ] [set sens 2 ]]
-;    [ ifelse(xcor >=  0)[ set sens 1 ] [set sens 2 ]]
+to avoidIllegalPatch[]
   
-        
-  
- while[bool][ 
-        ifelse(sens = 1)[set heading (heading + 2)][set heading (heading - 2)]
-        ;show heading 
-        ifelse(look = nobody)[set bool TRUE][set bool look = patch-ahead 1] ;
-      ]
+ while[patch-ahead 1 = nobody][set heading (heading - 2) ]
+   
+   
+ let r  patch-right-and-ahead 90 3 
+ let l  patch-left-and-ahead 90 3
+ 
+   
+ while[[proba] of patch-ahead 1 != 100][ 
+   ;;;Check left and right paches to know wich side choose
+   ifelse(r = nobody )[ set heading (heading - 2)][
+     ifelse(l = nobody )[ set heading (heading + 2)][
+       ifelse([proba] of r <= [proba] of l) [ set heading (heading - 2) ][set heading (heading + 2)]
+;       show heading 
+       while[patch-ahead 1 = nobody][set heading (heading - 2) ]
+ 
+     ]
+   ]
+;   ;show [proba] of patch-ahead 1
+
+ ]
     
 end
 
 ;;;;
 ;cross? return true if the agent is crossing a zebra or a izebra
-to-report cross?[]
-  
-  report  member? (patch-at 0 0) zebra or member? (patch-at 0 0) izebra
-  
-end
+;to-report cross?[]
+;  
+;  report  member? (patch-at 0 0) zebra or member? (patch-at 0 0) izebra
+;  
+;end
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Count, plot, watch global system state  ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;
@@ -869,6 +884,30 @@ to-report crossers
   report count turtles with [cross?] 
   
 end
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Trigo tools : some useful trigonometric tools ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; getAngle gives the smallest angle to turn a in order 
+;; to avoid an obstacle between a and g (the goal)
+;; a shloud be an agent and g a patch
+to getAngle [xa ya xg yg]
+  let dist 0
+  set dist sqrt( (xg - xa) ^ 2 + (xg - xa) ^ 2)
+  print dist
+end
+;;norm(a,b) return the length of the segment ab
+;to-report norm [a,b]
+;  report 
+;end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 383
@@ -948,7 +987,7 @@ pSpeed
 pSpeed
 0
 100
-15
+5
 1
 1
 NIL
@@ -963,7 +1002,7 @@ pNb
 pNb
 0
 100
-1
+2
 1
 1
 NIL
@@ -1005,7 +1044,7 @@ probizeb
 probizeb
 0
 100
-3
+0
 1
 1
 NIL
@@ -1020,7 +1059,7 @@ probzeb
 probzeb
 0
 100
-40
+1
 1
 1
 NIL
@@ -1043,6 +1082,37 @@ false
 PENS
 "illegal" 1.0 0 -2674135 true
 "legal" 1.0 0 -10899396 true
+
+SWITCH
+243
+157
+335
+190
+Person
+Person
+0
+1
+-1000
+
+TEXTBOX
+242
+139
+392
+157
+Shape us!
+9
+0.0
+1
+
+CHOOSER
+238
+86
+376
+131
+env
+env
+"ledru" "bmp"
+0
 
 @#$#@#$#@
 WHAT IS IT?
@@ -1388,7 +1458,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 4.1.2
+NetLogo 4.1.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
