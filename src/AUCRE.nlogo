@@ -152,8 +152,7 @@ to initialize
   set NORTH 2
   
   ask patches [set proba -1]
-  if(env = "ledru")[ initializeLedru ]
-  if(env = "bmp")[ initializeBmp ]
+  initializeLedru
   setup-coor
 end
 
@@ -684,9 +683,11 @@ end
 ;; First Setup of the environnement
 to setup
   clear-all
-  initialize
-  
-  setup-patches
+  if(env = "ledru")[   
+    initialize
+    setup-patches
+  ]
+  if(env = "bmp")[ initializeBmp ]
   
   crt 20 [
     setup-agent
@@ -721,7 +722,7 @@ end
 
 
 ;;;
-;; fonction d'allumage et eteingages des feu du croisement : peut ETRE SIMPLIFIER
+;; fonction d'allumage et eteingages des feu du croisement : peut ETRE SIMPLIFIé
 to update-light
   
   switchOn 0 67
@@ -962,10 +963,10 @@ NIL
 NIL
 
 BUTTON
-171
-48
-245
-81
+252
+28
+326
+61
 Setup
 setup
 NIL
@@ -1076,10 +1077,10 @@ NIL
 HORIZONTAL
 
 PLOT
-22
-410
-182
-530
+16
+402
+176
+522
 Illegal
 Time
 Amount illegal p
@@ -1115,14 +1116,14 @@ Shape us!
 1
 
 CHOOSER
-238
-86
-376
-131
+241
+67
+333
+112
 env
 env
 "ledru" "bmp"
-0
+1
 
 @#$#@#$#@
 WHAT IS IT?

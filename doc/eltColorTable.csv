@@ -1,0 +1,5 @@
+Element_Name,nl_variable_name,nl_value,RGB_value,HexaValue
+"block",bcolor,brown,157 110 72,#9D6E48
+"zebra",zcolor,white,255 255 255,#FFFFFF
+"road",rcolor,black,0 0 0,#9D6E48
+"trottoir",tcolor,grey,141 141 141,#8D8D8D
