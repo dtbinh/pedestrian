@@ -9,7 +9,6 @@ globals
   
   h ;List of heights of building block
   w ;List of widths of building block
-  
   t ;List of width of trottoirs
   
     ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -45,6 +44,7 @@ globals
   roads         ;; patchset containing the patches that are roads
   buildings     ;; patchset containing the patches that are building's blocks
   inout        ;;  patchset sur lesquels de nouveaux piétons peuvent apparaître
+  numio        ;;number of input ouput zone available
   zebra        ;;patchset containing zebras
   izebra      ;;patchset containing illegal zebras
   lights
@@ -55,7 +55,6 @@ globals
   zcolor       ;; zebra color
   rcolor       ;; road color
   Lcolors
-  
   z-size       ;;epaisseur d'un passage piéton
   echelle      ;;echelle du plan a 
   SOUTH1       ;; identifiant de la première partie passage pietons au SUD 
@@ -64,6 +63,8 @@ globals
   WEST         ;; identifiant du passage pietons à l'OUEST
   NORTH        ;; identifiant du passage pietons au NORD
 
+
+  bmpFilename  ;;file name of the background image
 ]
 
 turtles-own
@@ -104,7 +105,10 @@ patches-own
 ]
 
 
-
+breed[
+  cars car
+  
+]
 ;;;;
 ;; initiailise certaines variables statiques comme les couleurs 
 ;; certaines mesures statiques et fait appelle aux procedures pour calculer les coordonnés en fonction de ces
@@ -118,6 +122,30 @@ to initialize
   set tcolor grey
   set lights patch-set nobody
   
+  
+  set SOUTH1 0
+  set SOUTH2 4
+  
+  set EAST 1
+  
+  set WEST 3
+  
+  set NORTH 2
+  
+  ask patches [set proba -1]
+ 
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Cette fonction initialise les mesures necessaires 
+;; au calcul des coordonnées des différent éléments du carrefour spécifiquemment pour 
+;; le croisemment ledru rollin/Faubourg SA.
+;; c'est ici que sont déclarées les largeurs des trottoirs, des routes, etc.. En fonction de mesures faites TRES
+;; approximativemment à partir du plan gracieusement imprimé par le service de l'urbanisme du XIe arrondissement de Paris
+;;
+;; 
+to initializeLedru
   set w [12 16 18 0 18 ]  
   set h [14 15 12 17]
   set bx1 [0 0 0 0] 
@@ -141,31 +169,6 @@ to initialize
   set ty2 [0 0 0 0] 
  
   set t [6 2 3 3 3 3 4 6]
-  
-  set SOUTH1 0
-  set SOUTH2 4
-  
-  set EAST 1
-  
-  set WEST 3
-  
-  set NORTH 2
-  
-  ask patches [set proba -1]
-  initializeLedru
-  setup-coor
-end
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Cette fonction initialise les mesures necessaires 
-;; au calcul des coordonnées des différent éléments du carrefour spécifiquemment pour 
-;; le croisemment ledru rollin/Faubourg SA.
-;; c'est ici que sont déclarées les largeurs des trottoirs, des routes, etc.. En fonction de mesures faites TRES
-;; approximativemment à partir du plan gracieusement imprimé par le service de l'urbanisme du XIe arrondissement de Paris
-;;
-;; 
-to initializeLedru
   
   set echelle 5  ;;echelle approximative pour passer des mesures en cm sur le papier au m de la réalité. 1 patch = 1m
   set z-size 0.8 * echelle
@@ -195,10 +198,10 @@ end
 extensions[ bitmap ]
 
 to initializeBmp
+ set bmpFilename "../data/t1.bmp"
 
- let bg bitmap:import "../data/t1.bmp"
- show bitmap:height bg
- set bg bitmap:scaled bg 80 80
+ let bg bitmap:import bmpFilename 
+ ; set bg bitmap:scaled bg 81 81
  bitmap:copy-to-pcolors bg TRUE
 end
 
@@ -238,7 +241,22 @@ to setup-patches
   setup-lightLedru
   
 end
+to setup-patchesBmp
+    ask patches [
+    set zebra-id -1
+    set zid -1
+  ] 
+  
+  set trottoirs patches with [ pcolor = tcolor ]
+  
+  set buildings patches with [ pcolor = bcolor] ask buildings [let pzcor 10]
+  set zebra patches with [ pcolor = zcolor]
 
+  ask zebra [ set proba probzeb]
+  ask trottoirs [ set proba 100 let pzcor 2] ;draw trottoirs
+  setup-inoutBmp
+end  
+  
 ;;;;;;;;
 ;;setup zebra 
 ;;Defini est dessine les zones de passage piétons en fonction des coordonnées 
@@ -332,7 +350,7 @@ end
 to trottoirs-coor
   
   
-  ;;;set cordinate of trottoire
+  ;;;set cordinate of pavement
   set tx1 replace-item 0 tx1 item 0 bx1
   set ty1 replace-item 0 ty1 item 0 by1
   
@@ -595,7 +613,26 @@ to setup-inout
   ]
   
   set-metro
-  
+set numio max [io-id] of patches
+
+end
+
+to setup-inoutBmp
+  set inout patches with [
+    pcolor = tcolor and (pxcor = max-pxcor - 1 or pxcor = min-pxcor + 1 or pycor = max-pycor - 1 or pycor = min-pycor + 1)
+  ]
+  ask inout [
+    
+    if pycor = min-pycor + 1  [setio 0 ]
+    
+    if pxcor = max-pxcor - 1 [setio 1 ]    
+    
+    if pycor = max-pycor - 1 [setio 2 ]
+    
+    if pxcor = min-pxcor + 1[setio 3 ]
+    
+  ]
+  set numio max [io-id] of patches
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -631,7 +668,7 @@ to set-metro
   ask currentMetro [ setio 10  ]
   set inout (patch-set inout currentMetro)
   
-  ;  ask [ setio 8  ]
+
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -653,12 +690,8 @@ end
 ;;
 to setup-agent
   
-  
-  ;set shape "person"
   move-to one-of inout
-
-
-  set goal random (max [io-id] of patches)
+  set goal random numio
   set quick random 0
   set speed 1;set heading towardsxy [pxcor] of g [pycor] of g    ;; On oriente la direction de l'agent vers ce but
   set cross? FALSE;
@@ -666,7 +699,20 @@ to setup-agent
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; setup the cars 
+;; and assign him/it with a random entry 
+;;
+to setup-cars
+  
+  ;move-to one-of inout-road
+  set goal random numio
+  set quick random 0
+  set speed 1;set heading towardsxy [pxcor] of g [pycor] of g    ;; On oriente la direction de l'agent vers ce but
+  set cross? FALSE;
+  face get-goal
+end
+;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
@@ -683,11 +729,14 @@ end
 ;; First Setup of the environnement
 to setup
   clear-all
+  initialize
+  
   if(env = "ledru")[   
-    initialize
+    initializeLedru
+    setup-coor
     setup-patches
   ]
-  if(env = "bmp")[ initializeBmp ]
+  if(env = "bmp")[ initializeBmp setup-patchesBmp]
   
   crt 20 [
     setup-agent
@@ -770,20 +819,28 @@ end
 ;
 ;
 to go
-  tick ;la simulation avance d'un pas
-  ask lights [update-light] ;mets à jours les feux
-  ask turtles [
-    agent-behavior
-    ifelse(Person)[ set shape "person"][set shape "arrow"] 
-    set lifetime (lifetime + 1)
+  output-init
+  repeat duration[
+    if avort [stop]
+    tick ;la simulation avance d'un pas
+    ask lights [update-light] ;mets à jours les feux
+    ask turtles [
+      agent-behavior
+      ifelse(Person)[ set shape "person"][set shape "arrow"] 
+      set lifetime (lifetime + 1)
+    ]
+    if (ticks mod pSpeed = 0) [crt pNb [ setup-agent ]] ;procedure de réaparition des agents
+    
+    do-plot
+    
+    ask zebra [ set proba probzeb]
+    
+    ; ask izebra [set proba probizeb]
+    print-output
   ]
-  if (ticks mod pSpeed = 0) [crt pNb [ setup-agent ]] ;procedure de réaparition des agents
-  
- do-plot
-  
- ask zebra [ set proba probzeb]
- 
- ask izebra [set proba probizeb]
+  file-close
+  stop
+
 end 
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -793,26 +850,26 @@ end
 ;;;;;;;;;
 ;How the agent reacts?
 to agent-behavior
-  if(lifetime > 100)[ set goal random (max [io-id] of patches)]
-  if ([io-id] of patch-at 0 0 = goal)[die report 1]
+  if(lifetime > 100)[ set goal random numio set lifetime 0]
+  if ( ( member? patch-at 0 0  inout ) and ([io-id] of patch-at 0 0 = goal))[die report 1]
   
  
-  face get-goal
+ if(not cross?)[ face get-goal ]
 
   let look patch-ahead 1    
   ifelse( look != nobody )[ ;;case when pedestrian reach a limit of the world
-    if( [proba] of look = 100 )[ set cross? FALSE]    
+    if( [proba] of look >= 100 )[ set cross? FALSE]    
 
     if(not cross?)[ ;;si le pieton n'est pas déja entrain de traverser
       let p [proba] of look
       let z 0
       let al 0
       
-      if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false]set cross? TRUE ]
+    if( izebra != 0)[  if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false]set cross? TRUE ]]
       
-      if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false]set cross? TRUE]
+   if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false]set cross? TRUE]
       
-      if(al != 0)[ if(one-of[state] of al = 2 )[set p (p * 100)]]
+      if(al != 0)[ if(any? al)[if(one-of[state] of al = 2 )[set p (p * 100)]]]
       
       let r (random 100 + 1) 
       
@@ -832,27 +889,27 @@ end
 
 to avoidIllegalPatch[]
   
- while[patch-ahead 1 = nobody][set heading (heading - 2) ]
-   
-   
- let r  patch-right-and-ahead 90 3 
- let l  patch-left-and-ahead 90 3
- 
-   
- while[[proba] of patch-ahead 1 != 100][ 
-   ;;;Check left and right paches to know wich side choose
-   ifelse(r = nobody )[ set heading (heading - 2)][
-     ifelse(l = nobody )[ set heading (heading + 2)][
-       ifelse([proba] of r <= [proba] of l) [ set heading (heading - 2) ][set heading (heading + 2)]
-;       show heading 
-       while[patch-ahead 1 = nobody][set heading (heading - 2) ]
- 
-     ]
-   ]
-;   ;show [proba] of patch-ahead 1
-
- ]
+  while[patch-ahead 1 = nobody][set heading (heading - 2) ]
+  
+  
+  let r  patch-right-and-ahead 90 3 
+  let l  patch-left-and-ahead 90 3
+  
+  
+  while[[proba] of patch-ahead 1 != 100][ 
+    ;;;Check left and right paches to know wich side choose
+    ifelse(r = nobody )[ set heading (heading - 2)][
+      ifelse(l = nobody )[ set heading (heading + 2)][
+        ifelse([proba] of r <= [proba] of l) [ set heading (heading - 2) ][set heading (heading + 2)]
+        ;       show heading 
+        while[patch-ahead 1 = nobody][set heading (heading - 2) ]
+        
+      ]
+    ]
+    ;   ;show [proba] of patch-ahead 1
     
+  ]
+  
 end
 
 ;;;;
@@ -878,36 +935,68 @@ to do-plot
   set-current-plot-pen "legal"
   plot num-legal   
   set-current-plot-pen "illegal"
-    plot crossers - num-legal   
-;    show num-legal
+  plot crossers - num-legal   
+  ;    show num-legal
 end 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Var count                                     ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;return the number of agent crossing a zebra with green lights
 to-report num-legal
- report count turtles with [ (member? (patch-at 0 0) zebra) ]
-;and ( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2) ;THE LIGHT HAVE TO BE GREEN
+ report count turtles with [ (member? (patch-at 0 0) zebra)  and ( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] ;THE LIGHT HAVE TO BE GREEN
 end
 
+to-report greenNotZebra
+ report count turtles with [ not (member? (patch-at 0 0) zebra) and ( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+end
+
+to-report zebraNotGreen
+ report count turtles with [ member? (patch-at 0 0) zebra and not( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+end
+
+to-report doNotCare
+ report count turtles with [ not(member? (patch-at 0 0) zebra) and not( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+end
+
+
+to-report total
+  report count turtles
+end
+
+to-report onsidewalk
+   report count turtles with [ (member? (patch-at 0 0) trottoirs) ]
+end
 
 to-report crossers
   report count turtles with [cross?] 
   
 end
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Output Printing                               ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to output-init
+  file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
+  file-print "time,imgId,pzebra,pizeb,A,B,C,D,notOnSidewalk,total"
+end
 
 
-
+to print-output
+  file-print (word ticks "," bmpFilename "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," (total - onsidewalk) "," total)
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Trigo tools : some useful trigonometric tools ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; getAngle gives the smallest angle to turn a in order 
-;; to avoid an obstacle between a and g (the goal)
+;; getAngle gives the smallest angle to turn a (the current agent) in order 
+;; to avoid an obstacle between a (the agent) and g (the goal)
 ;; a shloud be an agent and g a patch
 to getAngle [xa ya xg yg]
   let dist 0
@@ -921,13 +1010,13 @@ end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
-383
+347
 10
-879
-527
+762
+446
 40
 40
-6.0
+5.0
 1
 10
 1
@@ -947,10 +1036,10 @@ GRAPHICS-WINDOW
 ticks
 
 BUTTON
-65
-49
-128
-82
+21
+13
+84
+46
 Go
 go
 T
@@ -963,10 +1052,10 @@ NIL
 NIL
 
 BUTTON
-252
-28
-326
-61
+228
+16
+302
+49
 Setup
 setup
 NIL
@@ -998,7 +1087,7 @@ pSpeed
 pSpeed
 0
 100
-5
+20
 1
 1
 NIL
@@ -1013,7 +1102,7 @@ pNb
 pNb
 0
 100
-2
+4
 1
 1
 NIL
@@ -1030,9 +1119,9 @@ Caractéristiques d'apparition des nouveaux pietons :
 1
 
 PLOT
-197
+180
 402
-357
+340
 522
 Num pietons
 NIL
@@ -1047,10 +1136,10 @@ PENS
 "default" 1.0 0 -16777216 true
 
 SLIDER
-35
-310
-127
-343
+24
+291
+116
+324
 probizeb
 probizeb
 0
@@ -1062,10 +1151,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-139
-311
-231
-344
+128
+291
+220
+324
 probzeb
 probzeb
 0
@@ -1077,9 +1166,9 @@ NIL
 HORIZONTAL
 
 PLOT
-16
+8
 402
-176
+168
 522
 Illegal
 Time
@@ -1095,10 +1184,10 @@ PENS
 "legal" 1.0 0 -10899396 true
 
 SWITCH
-243
-157
-335
-190
+175
+118
+267
+151
 Person
 Person
 0
@@ -1106,24 +1195,50 @@ Person
 -1000
 
 TEXTBOX
-242
-139
-392
-157
+174
+100
+324
+118
 Shape us!
 9
 0.0
 1
 
 CHOOSER
-241
-67
-333
-112
+228
+54
+320
+99
 env
 env
 "ledru" "bmp"
+0
+
+SLIDER
+22
+58
+149
+91
+duration
+duration
+0
+2000
+1000
+100
 1
+NIL
+HORIZONTAL
+
+SWITCH
+87
+12
+177
+45
+avort
+avort
+1
+1
+-1000
 
 @#$#@#$#@
 WHAT IS IT?
