@@ -946,19 +946,19 @@ end
 ;;;
 ;return the number of agent crossing a zebra with green lights
 to-report num-legal
- report count turtles with [ (member? (patch-at 0 0) zebra)  and ( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] ;THE LIGHT HAVE TO BE GREEN
+ report count turtles with [ (member? (patch-at 0 0) zebra)  and ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)] ;THE LIGHT HAVE TO BE GREEN
 end
 
 to-report greenNotZebra
- report count turtles with [ not (member? (patch-at 0 0) zebra) and ( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+ report count turtles with [ not (member? (patch-at 0 0) zebra) and ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)] 
 end
 
 to-report zebraNotGreen
- report count turtles with [ member? (patch-at 0 0) zebra and not( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+ report count turtles with [ member? (patch-at 0 0) zebra and not( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)]
 end
 
 to-report doNotCare
- report count turtles with [ not(member? (patch-at 0 0) zebra) and not( [state] of (lights with [zebra-id = [zid] of patch-at 0 0 ]) = 2)] 
+ report count turtles with [ not(member? (patch-at 0 0) zebra) and not( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not(member? (patch-at 0 0) trottoirs) ] 
 end
 
 
@@ -1223,7 +1223,7 @@ duration
 duration
 0
 2000
-1000
+2000
 100
 1
 NIL
