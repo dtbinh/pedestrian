@@ -64,7 +64,7 @@ globals
   NORTH        ;; identifiant du passage pietons au NORD
 
 
-  bmpFilename  ;;file name of the background image
+;  bmpFilename  ;;file name of the background image
 ]
 
 turtles-own
@@ -198,9 +198,11 @@ end
 extensions[ bitmap ]
 
 to initializeBmp
- set bmpFilename "../data/t1.bmp"
+ if(bmpFilename = "") [ set bmpFilename "../data/t1.bmp"]
 
- let bg bitmap:import bmpFilename 
+ let bg bitmap:import bmpFilename
+; set world-width bitmap:width bg 
+; set world-height bitmap:height bg 
  ; set bg bitmap:scaled bg 81 81
  bitmap:copy-to-pcolors bg TRUE
 end
@@ -212,6 +214,7 @@ to setup-patches
   ask patches [
     set zebra-id -1
     set zid -1
+    set light-id -1
   ] 
   
   setup-zebra
@@ -946,19 +949,19 @@ end
 ;;;
 ;return the number of agent crossing a zebra with green lights
 to-report num-legal
- report count turtles with [ (member? (patch-at 0 0) zebra)  and ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)] ;THE LIGHT HAVE TO BE GREEN
+ report count turtles with [ (member? (patch-at 0 0) zebra)  and ( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? ) ] ;THE LIGHT HAVE TO BE GREEN
 end
 
 to-report greenNotZebra
- report count turtles with [ not (member? (patch-at 0 0) zebra) and ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)] 
+ report count turtles with [ not (member? (patch-at 0 0) zebra) and ( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? )] 
 end
 
 to-report zebraNotGreen
- report count turtles with [ member? (patch-at 0 0) zebra and not( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2)]
+ report count turtles with [ member? (patch-at 0 0) zebra and not( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? )]
 end
 
 to-report doNotCare
- report count turtles with [ not(member? (patch-at 0 0) zebra) and not( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not(member? (patch-at 0 0) trottoirs) ] 
+ report count turtles with [ not(member? (patch-at 0 0) zebra) and not( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light?) and not(member? (patch-at 0 0) trottoirs) ] 
 end
 
 
@@ -1068,10 +1071,10 @@ NIL
 NIL
 
 SWITCH
-25
-119
-149
-152
+20
+205
+144
+238
 iocolored
 iocolored
 0
@@ -1079,10 +1082,10 @@ iocolored
 -1000
 
 SLIDER
-23
-230
-120
-263
+6
+321
+103
+354
 pSpeed
 pSpeed
 0
@@ -1094,10 +1097,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-134
-230
-229
-263
+117
+321
+212
+354
 pNb
 pNb
 0
@@ -1109,20 +1112,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-24
-204
-244
-228
+7
+295
+227
+319
 Caractéristiques d'apparition des nouveaux pietons :
 9
 0.0
 1
 
 PLOT
-180
-402
-340
-522
+175
+444
+335
+564
 Num pietons
 NIL
 NIL
@@ -1136,10 +1139,10 @@ PENS
 "default" 1.0 0 -16777216 true
 
 SLIDER
-24
-291
-116
-324
+7
+382
+99
+415
 probizeb
 probizeb
 0
@@ -1151,10 +1154,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-128
-291
-220
-324
+111
+382
+203
+415
 probzeb
 probzeb
 0
@@ -1166,10 +1169,10 @@ NIL
 HORIZONTAL
 
 PLOT
-8
-402
-168
-522
+3
+444
+163
+564
 Illegal
 Time
 Amount illegal p
@@ -1184,10 +1187,10 @@ PENS
 "legal" 1.0 0 -10899396 true
 
 SWITCH
-175
-118
-267
-151
+170
+204
+262
+237
 Person
 Person
 0
@@ -1195,10 +1198,10 @@ Person
 -1000
 
 TEXTBOX
-174
-100
-324
-118
+169
+186
+319
+204
 Shape us!
 9
 0.0
@@ -1223,7 +1226,7 @@ duration
 duration
 0
 2000
-2000
+400
 100
 1
 NIL
@@ -1236,9 +1239,20 @@ SWITCH
 45
 avort
 avort
-1
+0
 1
 -1000
+
+INPUTBOX
+228
+108
+318
+168
+bmpFileName
+../data/t1.bmp
+1
+0
+String
 
 @#$#@#$#@
 WHAT IS IT?
@@ -1261,7 +1275,8 @@ At the time I write the agents move followings those rules :
 
 HOW TO USE IT
 -------------
-Yet a "simple" user is only able to change the speed and the amount of pedestrian which appear.
+The user can choose the probability need to cross a red zebra or a izebra (area on the road but near to the zebra). 
+The user can also choose the path of a bmp image in order to use it as background for pedestrian.
 
 THINGS TO NOTICE
 ----------------
