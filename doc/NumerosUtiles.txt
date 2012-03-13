@@ -5,5 +5,7 @@ Service des Plans de Paris (12 Place de Porte de Vanve, 75014) :
 	email : pvp.dvd@paris.fr
 	
 
-STV (service technique voiriei?) 8 : 
+STV (Section Territorial Voirie) 8 : 
 	M. Ecker : 0140094632  //efficace, possede les durées de feux, mais responsable 11e-20e
+J'ai pas mal de numéro ici aussi :
+	http://www.service-public.fr/recherche/afsrecherche.php?KEYWORDS=section+territoriale+voirie&X=4&CAT=ANNUAIRE&GROUP_BY=TYPE|3	

@@ -738,6 +738,7 @@ to setup
     initializeLedru
     setup-coor
     setup-patches
+    set bmpFilename "ledru"
   ]
   if(env = "bmp")[ initializeBmp setup-patchesBmp]
   
@@ -1239,7 +1240,7 @@ SWITCH
 45
 avort
 avort
-0
+1
 1
 -1000
 
