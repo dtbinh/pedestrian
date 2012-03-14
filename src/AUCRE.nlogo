@@ -28,7 +28,7 @@ globals
   zx2        ;; ---
   zy1        ;; ---
   zy2        ;; ---goal
-
+  
   izx1        ;; cordinates of illegals zebra 
   izx2        ;; ---
   izy1        ;; ---
@@ -62,9 +62,9 @@ globals
   EAST         ;; identifiant du passage pietons à l'EST
   WEST         ;; identifiant du passage pietons à l'OUEST
   NORTH        ;; identifiant du passage pietons au NORD
-
-
-;  bmpFilename  ;;file name of the background image
+  
+  
+               ;  bmpFilename  ;;file name of the background image
 ]
 
 turtles-own
@@ -133,7 +133,7 @@ to initialize
   set NORTH 2
   
   ask patches [set proba -1]
- 
+  
 end
 
 
@@ -157,7 +157,7 @@ to initializeLedru
   set zy1 [0 0 0 0] 
   set zx2 [0 0 0 0] 
   set zy2 [0 0 0 0] 
- 
+  
   set izx1 [0 0 0 0] 
   set izy1 [0 0 0 0] 
   set izx2 [0 0 0 0] 
@@ -167,7 +167,7 @@ to initializeLedru
   set ty1 [0 0 0 0] 
   set tx2 [0 0 0 0] 
   set ty2 [0 0 0 0] 
- 
+  
   set t [6 2 3 3 3 3 4 6]
   
   set echelle 5  ;;echelle approximative pour passer des mesures en cm sur le papier au m de la réalité. 1 patch = 1m
@@ -198,13 +198,13 @@ end
 extensions[ bitmap ]
 
 to initializeBmp
- if(bmpFilename = "") [ set bmpFilename "../data/t1.bmp"]
-
- let bg bitmap:import bmpFilename
-; set world-width bitmap:width bg 
-; set world-height bitmap:height bg 
- ; set bg bitmap:scaled bg 81 81
- bitmap:copy-to-pcolors bg TRUE
+  if(bmpFilename = "") [ set bmpFilename "../data/t1.bmp"]
+  
+  let bg bitmap:import bmpFilename
+  ; set world-width bitmap:width bg 
+  ; set world-height bitmap:height bg 
+  ; set bg bitmap:scaled bg 81 81
+  bitmap:copy-to-pcolors bg TRUE
 end
 
 ;; Make the patches have appropriate colors, set up the roads and intersections agentsets,
@@ -245,7 +245,7 @@ to setup-patches
   
 end
 to setup-patchesBmp
-    ask patches [
+  ask patches [
     set zebra-id -1
     set zid -1
   ] 
@@ -254,12 +254,12 @@ to setup-patchesBmp
   
   set buildings patches with [ pcolor = bcolor] ask buildings [let pzcor 10]
   set zebra patches with [ pcolor = zcolor]
-
+  
   ask zebra [ set proba probzeb]
   ask trottoirs [ set proba 100 let pzcor 2] ;draw trottoirs
   setup-inoutBmp
 end  
-  
+
 ;;;;;;;;
 ;;setup zebra 
 ;;Defini est dessine les zones de passage piétons en fonction des coordonnées 
@@ -278,7 +278,7 @@ to setup-zebra
     
     ask item ? allip [
       if(zebra-id = -1)[
-      ;  set pcolor green ;
+        ;  set pcolor green ;
         set zid ?     ;assigne au patche du passage illegal l'id du zebra associer
       ]   
     ]      
@@ -291,9 +291,9 @@ to setup-zebra
   ask zebra with [zebra-id = 0 and (pxcor > 0)][set zebra-id SOUTH2 set pl-state 1]
   ask izebra with [zid = 0 and (pxcor > 0)][set zid SOUTH2]
   
- ask zebra [ set proba probzeb]
- 
- ask izebra [set proba probizeb]
+  ask zebra [ set proba probzeb]
+  
+  ask izebra [set proba probizeb]
   
 end
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -415,15 +415,15 @@ to zebra-coor
   
   set zx2 replace-item 2 zx2 ((item 2 tx1))
   set zy2 replace-item 2 zy2 ((item 3 ty1) + (1 * echelle)  + z-size)
-
+  
   set zx1 replace-item 3 zx1 ((item 0 tx2) - (2.5 * echelle) - z-size )
   set zy1 replace-item 3 zy1 ((item 0 ty2) + 1 )
-
+  
   set zx2 replace-item 3 zx2 ((item 0 tx2) - (2.5 * echelle))
   set zy2 replace-item 3 zy2 ((item 3 ty1) - 1)
-
-
-
+  
+  
+  
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;; Set illegal zebra- 
   ;; !!LES AGRANDIR AU REBORD DES PLUS GRANDS TROTTOIRES QUI LeS BORDENT
@@ -451,7 +451,7 @@ to zebra-coor
   
   set izx1 replace-item 3 izx1 ((item 3 zx1) - 10 )
   set izy1 replace-item 3 izy1 ((item 0 ty2) + 1 )
-
+  
   set izx2 replace-item 3 izx2 ((item 0 tx2))
   set izy2 replace-item 3 izy2 ((item 3 ty1) - 1)
   
@@ -616,8 +616,8 @@ to setup-inout
   ]
   
   set-metro
-set numio max [io-id] of patches
-
+  set numio max [io-id] of patches
+  
 end
 
 to setup-inoutBmp
@@ -671,7 +671,7 @@ to set-metro
   ask currentMetro [ setio 10  ]
   set inout (patch-set inout currentMetro)
   
-
+  
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -844,7 +844,7 @@ to go
   ]
   file-close
   stop
-
+  
 end 
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -857,21 +857,21 @@ to agent-behavior
   if(lifetime > 100)[ set goal random numio set lifetime 0]
   if ( ( member? patch-at 0 0  inout ) and ([io-id] of patch-at 0 0 = goal))[die report 1]
   
- 
- if(not cross?)[ face get-goal ]
-
+  
+  if(not cross?)[ face get-goal ]
+  
   let look patch-ahead 1    
-  ifelse( look != nobody )[ ;;case when pedestrian reach a limit of the world
+  ifelse( look != nobody )[ ;;case when pedestrian reachs a limit of the world
     if( [proba] of look >= 100 )[ set cross? FALSE]    
-
+    
     if(not cross?)[ ;;si le pieton n'est pas déja entrain de traverser
       let p [proba] of look
       let z 0
       let al 0
       
-    if( izebra != 0)[  if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false]set cross? TRUE ]]
+      if( izebra != 0)[  if(member? look izebra)[ set al lights with [zebra-id = ([zid] of look) and car-light? = false]set cross? TRUE ]]
       
-   if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false]set cross? TRUE]
+      if(member? look zebra)[ set al lights with [zebra-id = ([zebra-id] of look) and car-light? = false]set cross? TRUE]
       
       if(al != 0)[ if(any? al)[if(one-of[state] of al = 2 )[set p (p * 100)]]]
       
@@ -885,8 +885,8 @@ to agent-behavior
     ]
     ;  
     
- ][avoidIllegalPatch]
-    fd speed 
+  ][avoidIllegalPatch]
+  fd speed 
   
 end
 
@@ -950,68 +950,112 @@ end
 ;;;
 ;return the number of agent crossing a zebra with green lights
 to-report num-legal
- report count turtles with [ (member? (patch-at 0 0) zebra)  and ( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? ) ] ;THE LIGHT HAVE TO BE GREEN
+  let n-ind 0
+  ask turtles[  
+    let z [zebra-id] of (patch-at 0 0)                          ;;zebra id of the patch under me
+    if( (member? (patch-at 0 0) zebra) and                 ;;the patch under me is a zebra 
+      (one-of [state] of (lights with [zebra-id = z and not car-light? ]) = 2)) [ 
+    set n-ind n-ind + 1 ;;the associated light is green (and not an car light)
+      ]
+  ]
+  report n-ind
 end
 
 to-report greenNotZebra
- report count turtles with [ not (member? (patch-at 0 0) zebra) and ( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? )] 
+  let n-ind 0
+  ask turtles[  
+    let z [zid] of (patch-at 0 0)                          ;;zebra id of the patch under me
+    if( (member? (patch-at 0 0) izebra) and                 ;;the patch under me is a izebra 
+      (one-of [state] of (lights with [zebra-id = z and not car-light? ]) = 2)) [ 
+    set n-ind n-ind + 1 ;;the associated light is green (and not an car light)
+      ]
+  ]
+  report n-ind
 end
 
 to-report zebraNotGreen
- report count turtles with [ member? (patch-at 0 0) zebra and not( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light? )]
+  let n-ind 0
+  ask turtles[  
+    let z [zebra-id] of (patch-at 0 0)                          ;;zebra id of the patch under me
+    if( (member? (patch-at 0 0) zebra) and                 ;;the patch under me is a zebra 
+      (one-of [state] of (lights with [zebra-id = z and not car-light? ]) != 2)) [ 
+    set n-ind n-ind + 1 ;;the associated light is green (and not an car light)
+      ]
+  ]
+  report n-ind
 end
 
 to-report doNotCare
- report count turtles with [ not(member? (patch-at 0 0) zebra) and not( ( [state] of (lights with [zebra-id = [zebra-id] of patch-at 0 0 ]) = 2) and not car-light?) and not(member? (patch-at 0 0) trottoirs) ] 
+  let n-ind 0
+  ask turtles[  
+    let z [zid] of (patch-at 0 0)                          ;;zebra id of the patch under me
+    if( (member? (patch-at 0 0) izebra) and                 ;;the patch under me is a izebra 
+      (one-of [state] of (lights with [zebra-id = z and not car-light? ]) != 2)) [ 
+    set n-ind n-ind + 1 ;;the associated light is green (and not an car light)
+      ]
+  ]
+  report n-ind
 end
 
-
+to-report crosserNotReferenced
+  let n-ind 0
+  ask turtles[  
+    let z [zid] of (patch-at 0 0)                          
+    if( not (member? (patch-at 0 0) zebra or member? (patch-at 0 0) izebra or member? (patch-at 0 0) trottoirs ) )[
+      set n-ind n-ind + 1 ;;the associated light is green (and not an car light)
+    ]
+  ]
+  report n-ind
+end
+  
+  
 to-report total
   report count turtles
 end
-
+  
 to-report onsidewalk
-   report count turtles with [ (member? (patch-at 0 0) trottoirs) ]
+  report count turtles with [ (member? (patch-at 0 0) trottoirs) ]
 end
-
+  
 to-report crossers
   report count turtles with [cross?] 
   
 end
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Output Printing                               ;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Output Printing                               ;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to output-init
   file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
-  file-print "time,imgId,pzebra,pizeb,A,B,C,D,notOnSidewalk,total"
+  file-print "time,imgId,pzebra,pizeb,A,B,C,D,E,notOnSidewalk,total" ;
 end
-
-
+  
+  
 to print-output
-  file-print (word ticks "," bmpFilename "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," (total - onsidewalk) "," total)
+  file-print (word ticks "," bmpFilename "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
 end
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Trigo tools : some useful trigonometric tools ;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; getAngle gives the smallest angle to turn a (the current agent) in order 
-;; to avoid an obstacle between a (the agent) and g (the goal)
-;; a shloud be an agent and g a patch
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Trigo tools : some useful trigonometric tools ;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  
+  
+  ;; getAngle gives the smallest angle to turn a (the current agent) in order 
+  ;; to avoid an obstacle between a (the agent) and g (the goal)
+  ;; a shloud be an agent and g a patch
 to getAngle [xa ya xg yg]
   let dist 0
   set dist sqrt( (xg - xa) ^ 2 + (xg - xa) ^ 2)
   print dist
 end
-;;norm(a,b) return the length of the segment ab
-;to-report norm [a,b]
-;  report 
-;end
-
+  ;;norm(a,b) return the length of the segment ab
+  ;to-report norm [a,b]
+  ;  report 
+  ;end
+  
+  
 @#$#@#$#@
 GRAPHICS-WINDOW
 347
@@ -1226,8 +1270,8 @@ SLIDER
 duration
 duration
 0
-2000
-400
+50000
+15600
 100
 1
 NIL
@@ -1240,7 +1284,7 @@ SWITCH
 45
 avort
 avort
-1
+0
 1
 -1000
 
@@ -1250,7 +1294,7 @@ INPUTBOX
 318
 168
 bmpFileName
-../data/t1.bmp
+ledru
 1
 0
 String
