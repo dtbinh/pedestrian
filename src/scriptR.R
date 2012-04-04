@@ -33,8 +33,8 @@ tableAllCase<-function(data){
 		myrow=c(myrow,s)
 		newline=c()
 		mycol=c()
-		for(fx in unique(data$feux)){
-			for(z in unique(data$legalx)){
+		for(fx in sort(unique(data$feux))){
+			for(z in sort(unique(data$legalx))){
 				newline=cbind(newline,length(data[ data$feux == fx & data$legalx == z & data$site == s,1])/length(data[data$site == s,1]))
 				mycol=c(mycol,paste(fx,z,sep="-"))
 			}
@@ -46,3 +46,13 @@ tableAllCase<-function(data){
 	rownames(res)=myrow
 	return(res)
 }
+
+myBarplot2<-function(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",...){
+library(gplots)
+
+barplot2(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",col=c(heat.colors(nrow(a)-1),"black"),...)
+
+
+}
+
+

@@ -1,4 +1,51 @@
 [General]
+def_graphic_ext=eps
+img_extIsRegExp=false
+img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
 kileversion=2.0.85
+lastDocument=
+masterDocument=
 name=Presentation PISTES
+pkg_extIsRegExp=false
+pkg_extensions=.cls .sty .bbx .cbx .lbx
+src_extIsRegExp=false
+src_extensions=.tex .ltx .latex .dtx .ins
+
+[Tools]
+MakeIndex=
+QuickBuild=
+
+[document-settings,item:main.tex]
+Bookmarks=
+Encoding=UTF-8
+Highlighting=LaTeX
+Indentation Mode=cstyle
+Mode=LaTeX
+ReadWrite=true
+
+[item:main.tex]
+archive=true
+column=0
+encoding=UTF-8
+highlight=LaTeX
+line=0
+mode=LaTeX
+open=true
+order=0
+
+[item:presentationpistes.kilepr]
+archive=true
+column=4
+encoding=
+highlight=
+line=0
+mode=
+open=false
+order=-1
+
+[view-settings,view=0,item:main.tex]
+CursorColumn=0
+CursorLine=0
+ViRegisterContents=],child {node {dev }}\nchil d {node { e t c }\nch i l d {node { s y s c o n f i g }}\nch i l d {node { i n i t . d}}\n}\nch i l d {node {home}}\nch i l d {node { u s r } } ;\n
+ViRegisterNames=-,0
