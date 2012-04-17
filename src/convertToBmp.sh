@@ -4,7 +4,7 @@
 
 if [ -z "$1" ]
 then
-	echo -e "usage :./convertToBmp.sh filename WIDTHxHEIGHT\nwhere: \n\t WIDTH is the width of the netlogo area \n\t HEIGHT the height of the netlogo area"
+	echo -e "This script is used to convert and crop pdf into smaller bmp.\nusage :./convertToBmp.sh filename.pdf WIDTHxHEIGHT\nwhere: \n\t WIDTH is the width of the netlogo area \n\t HEIGHT the height of the netlogo area"
 	exit 1;
 fi
 fname=`basename "$1"`

@@ -1,0 +1,7 @@
+Le dossier doc contient divers documents
+Le dossier data contient :
+	1-Les résultats des simulations (en csv)
+	2-les plans des carrefours dans differents formats
+Les fichier .dwg (fichiers autocad) contenu dans "data" peuvent être lu avec draftSight quu'il faut installer (attention fichier propriétaire de dassault)
+le dossier bin contien divers executable/.deb etc.. pouvant être utilie
+le dossier src continent les soruces du modèle netlogo ainsi que de divers scripts utiles

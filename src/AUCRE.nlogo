@@ -114,12 +114,12 @@ breed[
 ;; certaines mesures statiques et fait appelle aux procedures pour calculer les coordonnés en fonction de ces
 ;; mesures
 to initialize
-  set bcolor brown
+  set bcolor [157 110 72] ;brown
   set Lcolors [red orange green]
   set iocolors [blue green red yellow]
-  set zcolor white
-  set rcolor black
-  set tcolor grey
+  set zcolor [255 255 255] ;white
+  set rcolor [0 0 0] ;black
+  set tcolor [141 141 141];grey
   set lights patch-set nobody
   
   
@@ -204,7 +204,7 @@ to initializeBmp
   ; set world-width bitmap:width bg 
   ; set world-height bitmap:height bg 
   ; set bg bitmap:scaled bg 81 81
-  bitmap:copy-to-pcolors bg TRUE
+  bitmap:copy-to-pcolors bg FALSE
 end
 
 ;; Make the patches have appropriate colors, set up the roads and intersections agentsets,
@@ -238,7 +238,6 @@ to setup-patches
   
   set buildings patches with [ pcolor = bcolor]
   
-  
   setup-inout
   
   setup-lightLedru
@@ -248,17 +247,37 @@ to setup-patchesBmp
   ask patches [
     set zebra-id -1
     set zid -1
+    set light-id -1
   ] 
   
   set trottoirs patches with [ pcolor = tcolor ]
   
   set buildings patches with [ pcolor = bcolor] ask buildings [let pzcor 10]
-  set zebra patches with [ pcolor = zcolor]
-  
-  ask zebra [ set proba probzeb]
+
   ask trottoirs [ set proba 100 let pzcor 2] ;draw trottoirs
+  setup-zebraBmp
   setup-inoutBmp
+  setup-lightBmp
 end  
+
+
+to setup-lightBmp
+  set lights patches with [ (item 0 pcolor) = 255 and ( (item 1 pcolor) = 0 or (item 1 pcolor) = 1 ) ] 
+
+  ask lights with [ (item 1 pcolor) = 0 ] [set light-id item 2 pcolor]
+  ask lights with [ (item 1 pcolor) = 1 ] [set light-id item 2 pcolor set car-light? true set state 0 changeCol]
+end
+
+
+to setup-zebraBmp
+    set zebra patches with [  (item 0 pcolor) = 255 and (item 1 pcolor) = 255 ]
+;  ask zebra [ set proba probzeb]
+  ask zebra [set zebra-id 255 - item 2 pcolor set proba probzeb ] 
+  
+  set izebra patches with [ (item 0 pcolor) = 0 and (item 1 pcolor) = 0 ] 
+  ask izebra [set zid item 2 pcolor set proba probizeb ] 
+ 
+end
 
 ;;;;;;;;
 ;;setup zebra 
@@ -698,6 +717,7 @@ to setup-agent
   set quick random 0
   set speed 1;set heading towardsxy [pxcor] of g [pycor] of g    ;; On oriente la direction de l'agent vers ce but
   set cross? FALSE;
+  set size 4
   face get-goal
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -775,7 +795,7 @@ end
 
 
 ;;;
-;; fonction d'allumage et eteingages des feu du croisement : peut ETRE SIMPLIFIé
+;; fonction d'allumage et eteignage des feux du croisement : peut ETRE SIMPLIFIé
 to update-light
   
   switchOn 0 67
@@ -815,7 +835,25 @@ to update-light
   ;  if (ticks mod switch-t = 0)[ask zebra with [pl-state = 0] [ set pl-state 2] ask zebra with [pl-state = 1] [ set pl-state 0] ]
   changeCol
 end
+;;;
+;; fonction d'allumage et eteignage des feux en utilisant un fichier dans lequel tout est stocké
+to update-lightWithFile
+  
+  file-open timingFile
+  while [not file-at-end? ] [
+  let id file-read
+  let On file-read
+  let Off file-read
+  let Ora file-read
 
+  switchOn id On
+  switchOr id Ora
+  switchOff id Off
+  
+  changeCol
+  ]
+  file-close
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -827,7 +865,7 @@ to go
   repeat duration[
     if avort [stop]
     tick ;la simulation avance d'un pas
-    ask lights [update-light] ;mets à jours les feux
+    ask lights [update-lightWithFile] ;mets à jours les feux
     ask turtles [
       agent-behavior
       ifelse(Person)[ set shape "person"][set shape "arrow"] 
@@ -1030,11 +1068,14 @@ end
 to output-init
   file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
   file-print "time,imgId,pzebra,pizeb,A,B,C,D,E,notOnSidewalk,total" ;
+  file-close
 end
   
   
 to print-output
+  file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
   file-print (word ticks "," bmpFilename "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
+  file-close
 end
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1062,8 +1103,8 @@ GRAPHICS-WINDOW
 10
 958
 567
--1
--1
+200
+175
 1.5
 1
 10
@@ -1074,10 +1115,10 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-400
-0
-350
+-200
+200
+-175
+175
 1
 1
 1
@@ -1122,7 +1163,7 @@ SWITCH
 238
 iocolored
 iocolored
-0
+1
 1
 -1000
 
@@ -1238,7 +1279,7 @@ SWITCH
 237
 Person
 Person
-0
+1
 1
 -1000
 
@@ -1260,7 +1301,7 @@ CHOOSER
 env
 env
 "ledru" "bmp"
-0
+1
 
 SLIDER
 22
@@ -1271,7 +1312,7 @@ duration
 duration
 0
 50000
-15600
+15500
 100
 1
 NIL
@@ -1294,7 +1335,18 @@ INPUTBOX
 318
 168
 bmpFileName
-ledru
+../data/originaux/tolbiac-Italie.bmp
+1
+0
+String
+
+INPUTBOX
+37
+113
+117
+173
+timingFile
+../data/timing/ledru.tm
 1
 0
 String
