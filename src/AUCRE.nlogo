@@ -198,8 +198,8 @@ end
 extensions[ bitmap ]
 
 to initializeBmp
-  if(bmpFilename = "") [ set bmpFilename "../data/t1.bmp"]
-  
+;  if(bmpFilename = "") [ set bmpFilename "../data/intput/maps/t1.bmp"]
+  let bmpFilename (word "../data/input/maps/" Name ".bmp")
   let bg bitmap:import bmpFilename
   ; set world-width bitmap:width bg 
   ; set world-height bitmap:height bg 
@@ -640,21 +640,28 @@ to setup-inout
 end
 
 to setup-inoutBmp
+;  set inout patches with [
+;    pcolor = tcolor and (pxcor = max-pxcor - 1 or pxcor = min-pxcor + 1 or pycor = max-pycor - 1 or pycor = min-pycor + 1)
+;  ]
+;  ask inout [
+;    
+;    if pycor = min-pycor + 1  [setio 0 ]
+;    
+;    if pxcor = max-pxcor - 1 [setio 1 ]    
+;    
+;    if pycor = max-pycor - 1 [setio 2 ]
+;    
+;    if pxcor = min-pxcor + 1[setio 3 ]
+;    
+;  ]
   set inout patches with [
-    pcolor = tcolor and (pxcor = max-pxcor - 1 or pxcor = min-pxcor + 1 or pycor = max-pycor - 1 or pycor = min-pycor + 1)
+    item 0 pcolor = 0 and
+    item 0 pcolor = 255 
   ]
   ask inout [
-    
-    if pycor = min-pycor + 1  [setio 0 ]
-    
-    if pxcor = max-pxcor - 1 [setio 1 ]    
-    
-    if pycor = max-pycor - 1 [setio 2 ]
-    
-    if pxcor = min-pxcor + 1[setio 3 ]
-    
+    setio item 3 pcolor
   ]
-  set numio max [io-id] of patches
+  set numio max [io-id] of inout
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -758,7 +765,7 @@ to setup
     initializeLedru
     setup-coor
     setup-patches
-    set bmpFilename "ledru"
+;    set bmpFilename "ledru"
   ]
   if(env = "bmp")[ initializeBmp setup-patchesBmp]
   
@@ -838,8 +845,8 @@ end
 ;;;
 ;; fonction d'allumage et eteignage des feux en utilisant un fichier dans lequel tout est stocké
 to update-lightWithFile
-  
-  file-open timingFile
+  let timeFilname  (word "../data/input/timing/" Name ".tm") 
+  file-open timeFilname
   while [not file-at-end? ] [
   let id file-read
   let On file-read
@@ -1074,7 +1081,7 @@ end
   
 to print-output
   file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
-  file-print (word ticks "," bmpFilename "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
+  file-print (word ticks "," Name "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
   file-close
 end
   
@@ -1330,23 +1337,12 @@ avort
 -1000
 
 INPUTBOX
-228
-108
-318
-168
-bmpFileName
-../data/originaux/tolbiac-Italie.bmp
-1
-0
-String
-
-INPUTBOX
-37
-113
-117
-173
-timingFile
-../data/timing/ledru.tm
+46
+112
+133
+172
+Name
+SALR
 1
 0
 String
