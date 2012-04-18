@@ -19,7 +19,7 @@ pdftops -eps "$1" "$fname"
 
 #convert to bmp while croping and resing the image
 echo "eps to bmp"
-convert -density 300 "$fname" "$fname.bmp"
+convert -monochrome -density 300 "$fname" "$fname.bmp"
 #get original size"
 width=`identify -format "%[fx:w]" "$fname.bmp"`
 height=`identify -format "%[fx:h]" "$fname.bmp"`
