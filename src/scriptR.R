@@ -48,11 +48,8 @@ tableAllCase<-function(data){
 }
 
 myBarplot2<-function(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",...){
-library(gplots)
-
-barplot2(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",col=c(heat.colors(nrow(a)-1),"black"),...)
-
-
+	library(gplots)
+	barplot2(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",col=c(heat.colors(nrow(a)-1),"black"),...)
 }
 
 

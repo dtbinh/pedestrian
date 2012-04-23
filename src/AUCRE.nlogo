@@ -65,6 +65,7 @@ globals
   
   
                ;  bmpFilename  ;;file name of the background image
+  lightset     ; a list of list with the settings of the light
 ]
 
 turtles-own
@@ -132,8 +133,10 @@ to initialize
   
   set NORTH 2
   
+  
   ask patches [set proba -1]
   
+
 end
 
 
@@ -230,10 +233,6 @@ to setup-patches
     
   ]
   
-  
-  
-  
-  
   set trottoirs patches with [ pcolor = tcolor]
   
   set buildings patches with [ pcolor = bcolor]
@@ -263,18 +262,41 @@ end
 
 to setup-lightBmp
   set lights patches with [ (item 0 pcolor) = 255 and ( (item 1 pcolor) = 0 or (item 1 pcolor) = 1 ) ] 
+  ask lights [set light-id item 2 pcolor set zebra-id item 2 pcolor ]
+  ask lights with [ (item 1 pcolor) = 0 ] [set car-light? false ]
+  ask lights with [ (item 1 pcolor) = 1 ] [set car-light? true  ]
+  
+end
 
-  ask lights with [ (item 1 pcolor) = 0 ] [set light-id item 2 pcolor]
-  ask lights with [ (item 1 pcolor) = 1 ] [set light-id item 2 pcolor set car-light? true set state 0 changeCol]
+to init-lightset
+  let timeFilname  (word "../data/input/timing/" Name ".tm") 
+  set lightset []
+  file-open timeFilname
+  while [not file-at-end? ] [
+  let onelightset []
+  let id file-read
+  let On file-read
+  let Off file-read
+  let Ora file-read
+  set onelightset lput id onelightset
+  set onelightset lput On onelightset
+  set onelightset lput Off onelightset
+  set onelightset lput Ora onelightset
+  set lightset lput onelightset lightset
+
+  ]
+;  show lightset
+  file-close
+
 end
 
 
 to setup-zebraBmp
     set zebra patches with [  (item 0 pcolor) = 255 and (item 1 pcolor) = 255 ]
 ;  ask zebra [ set proba probzeb]
-  ask zebra [set zebra-id 255 - item 2 pcolor set proba probzeb ] 
+  ask zebra [set zebra-id (255 - item 2 pcolor) set proba probzeb ] 
   
-  set izebra patches with [ (item 0 pcolor) = 0 and (item 1 pcolor) = 0 ] 
+  set izebra patches with [ (item 0 pcolor) = 0 and (item 1 pcolor) = 1 ] 
   ask izebra [set zid item 2 pcolor set proba probizeb ] 
  
 end
@@ -656,10 +678,11 @@ to setup-inoutBmp
 ;  ]
   set inout patches with [
     item 0 pcolor = 0 and
-    item 0 pcolor = 255 
+    item 1 pcolor = 255 
   ]
   ask inout [
-    setio item 3 pcolor
+    setio item 2 pcolor
+    set proba 100
   ]
   set numio max [io-id] of inout
 end
@@ -845,13 +868,14 @@ end
 ;;;
 ;; fonction d'allumage et eteignage des feux en utilisant un fichier dans lequel tout est stocké
 to update-lightWithFile
-  let timeFilname  (word "../data/input/timing/" Name ".tm") 
-  file-open timeFilname
-  while [not file-at-end? ] [
-  let id file-read
-  let On file-read
-  let Off file-read
-  let Ora file-read
+;  let timeFilname  (word "../data/input/timing/" Name ".tm") 
+;  file-open timeFilname
+;  while [not file-at-end? ] [
+  foreach lightset[
+  let id item 0 ?
+  let On item 1 ?
+  let Off item 2 ?
+  let Ora item 3 ?
 
   switchOn id On
   switchOr id Ora
@@ -859,7 +883,6 @@ to update-lightWithFile
   
   changeCol
   ]
-  file-close
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -868,26 +891,65 @@ end
 ;
 ;
 to go
+
+  set probizeb 0
+  repeat 9[
+  set probzeb 1
+  repeat 9[
+  set pSpeed 1
+  repeat 4[
+  set pNb 1
+  repeat 4[
+  setup
+  init-lightset
   output-init
+  
   repeat duration[
     if avort [stop]
     tick ;la simulation avance d'un pas
+;    show "whatAv"
+
     ask lights [update-lightWithFile] ;mets à jours les feux
+;    show "whatAw"
+
     ask turtles [
+      
+;      show "whatAx"
       agent-behavior
+
+;      show "whatAz"
       ifelse(Person)[ set shape "person"][set shape "arrow"] 
       set lifetime (lifetime + 1)
+;      show "whatA"
+
     ]
+;      show "whatB"
+
     if (ticks mod pSpeed = 0) [crt pNb [ setup-agent ]] ;procedure de réaparition des agents
-    
+;    show "whatC"
+
     do-plot
-    
+  ;  show "whatD"
+
     ask zebra [ set proba probzeb]
-    
-    ; ask izebra [set proba probizeb]
+   ; show "whatE"
+
+    ask izebra [set proba probizeb]
     print-output
+    ;show "whatF"
+
   ]
-  file-close
+   file-close
+  set pNb pNb + 5
+  ]
+  set pSpeed pSpeed + 5
+  
+  ]
+  set probzeb probzeb + 10
+  ]
+  set probizeb probizeb + 5
+  ]
+ 
   stop
   
 end 
@@ -924,7 +986,7 @@ to agent-behavior
       
       if(r > p)[ 
         avoidIllegalPatch 
-        set cross? FALSE ;;unable to cross a ezbra/izebra
+        set cross? FALSE ;;unable to cross a zebra/izebra
       ]
       
     ]
@@ -945,7 +1007,8 @@ to avoidIllegalPatch[]
   let l  patch-left-and-ahead 90 3
   
   
-  while[[proba] of patch-ahead 1 != 100][ 
+  while[patch-ahead 1 = nobody or [proba] of patch-ahead 1 != 100][ 
+    
     ;;;Check left and right paches to know wich side choose
     ifelse(r = nobody )[ set heading (heading - 2)][
       ifelse(l = nobody )[ set heading (heading + 2)][
@@ -1067,22 +1130,21 @@ to-report crossers
   
 end
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  
-  
+ 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Output Printing                               ;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to output-init
-  file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
-  file-print "time,imgId,pzebra,pizeb,A,B,C,D,E,notOnSidewalk,total" ;
-  file-close
+  file-open (word "../data/output/modelOutputFiles/" date-and-time "PedestrianOutput.csv") ;
+  file-print "time,imgId,pzebra,pizeb,pSpeed,pNb,A,B,C,D,E,notOnSidewalk,total" ;
+;  file-close
 end
   
   
 to print-output
-  file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
-  file-print (word ticks "," Name "," probzeb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
-  file-close
+;  file-open (word "../data/" date-and-time "PedestrianOutput.csv") ;
+  file-print (word ticks "," Name "," probzeb "," pSpeed "," pNb "," probizeb "," num-legal "," greenNotZebra "," zebraNotGreen "," doNotCare "," crosserNotReferenced "," (total - onsidewalk) "," total)
+;  file-close
 end
   
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1183,7 +1245,7 @@ pSpeed
 pSpeed
 0
 100
-20
+1
 1
 1
 NIL
@@ -1198,7 +1260,7 @@ pNb
 pNb
 0
 100
-4
+1
 1
 1
 NIL
@@ -1286,7 +1348,7 @@ SWITCH
 237
 Person
 Person
-1
+0
 1
 -1000
 
@@ -1319,7 +1381,7 @@ duration
 duration
 0
 50000
-15500
+6000
 100
 1
 NIL
@@ -1332,7 +1394,7 @@ SWITCH
 45
 avort
 avort
-1
+0
 1
 -1000
 
