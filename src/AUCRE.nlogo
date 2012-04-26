@@ -276,12 +276,12 @@ to init-lightset
   let onelightset []
   let id file-read
   let On file-read
-  let Off file-read
   let Ora file-read
+  let Off file-read
   set onelightset lput id onelightset
   set onelightset lput On onelightset
-  set onelightset lput Off onelightset
   set onelightset lput Ora onelightset
+  set onelightset lput Off onelightset
   set lightset lput onelightset lightset
 
   ]
@@ -874,9 +874,9 @@ to update-lightWithFile
   foreach lightset[
   let id item 0 ?
   let On item 1 ?
-  let Off item 2 ?
   let Ora item 3 ?
-
+  let Off item 2 ?
+  
   switchOn id On
   switchOr id Ora
   switchOff id Off
@@ -896,7 +896,7 @@ to go
   repeat 9[
   set probzeb 1
   repeat 9[
-  set pSpeed 1
+  set pSpeed 21
   repeat 4[
   set pNb 1
   repeat 4[
@@ -907,37 +907,17 @@ to go
   repeat duration[
     if avort [stop]
     tick ;la simulation avance d'un pas
-;    show "whatAv"
-
     ask lights [update-lightWithFile] ;mets à jours les feux
-;    show "whatAw"
-
     ask turtles [
-      
-;      show "whatAx"
       agent-behavior
-
-;      show "whatAz"
       ifelse(Person)[ set shape "person"][set shape "arrow"] 
       set lifetime (lifetime + 1)
-;      show "whatA"
-
     ]
-;      show "whatB"
-
     if (ticks mod pSpeed = 0) [crt pNb [ setup-agent ]] ;procedure de réaparition des agents
-;    show "whatC"
-
     do-plot
-  ;  show "whatD"
-
     ask zebra [ set proba probzeb]
-   ; show "whatE"
-
     ask izebra [set proba probizeb]
     print-output
-    ;show "whatF"
-
   ]
    file-close
   set pNb pNb + 5
@@ -1245,7 +1225,7 @@ pSpeed
 pSpeed
 0
 100
-1
+21
 1
 1
 NIL
@@ -1394,7 +1374,7 @@ SWITCH
 45
 avort
 avort
-0
+1
 1
 -1000
 
@@ -1404,7 +1384,7 @@ INPUTBOX
 133
 172
 Name
-SALR
+tolbiac-Italie
 1
 0
 String
