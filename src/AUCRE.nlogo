@@ -874,8 +874,8 @@ to update-lightWithFile
   foreach lightset[
   let id item 0 ?
   let On item 1 ?
-  let Ora item 3 ?
-  let Off item 2 ?
+  let Ora item 2 ?
+  let Off item 3 ?
   
   switchOn id On
   switchOr id Ora
@@ -1384,7 +1384,7 @@ INPUTBOX
 133
 172
 Name
-tolbiac-Italie
+Faure-Convention
 1
 0
 String

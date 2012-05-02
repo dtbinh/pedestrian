@@ -47,6 +47,16 @@ tableAllCase<-function(data){
 	return(res)
 }
 
+catForAllMap<-function(data){
+A=tapply(data$A,data$imgId,mean)
+B=tapply(data$B,data$imgId,mean)
+C=tapply(data$C,data$imgId,mean)
+D=tapply(data$D,data$imgId,mean)
+E=tapply(data$E,data$imgId,mean)
+return(rbind(A,B,C,D,E))
+}
+
+
 myBarplot2<-function(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",...){
 	library(gplots)
 	barplot2(data,beside=T,legend=T,main="Repartition des Differents types \n de traversées pour 4 carrefour et notre modèle",xlab="types de traversée",ylab="pourcentage d'individus",col=c(heat.colors(nrow(a)-1),"black"),...)
