@@ -1,7 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;AUCRE Simulation de traversé de pietons
 ;;;;;;;
-;;;;;;;Première implémentation Mars 2011, Simon Carrignon simon.carrignon@gmail.com
+;;;;;;;Première implémentation Mars 2011, Simon Carrignon simon.carrignon@elisya.org
+;;;;;;;version public Août 2012 (branch master du git)
+;;;;;;;disponible : git@gitorious.org:pedestrian/pedestrian.git
 ;;;;;;;
 
 globals
@@ -19,7 +21,7 @@ globals
     ;;;;;;;;
   
   
-  bx1        ;;coordonées des block d'immeubles
+  bx1        ;;coordonées des blocks d'immeubles
   bx2        ;; ---
   by1        ;; ---
   by2        ;; ---
@@ -38,8 +40,19 @@ globals
   tx2        ;; ---
   ty1        ;; ---
   ty2        ;; ---
-  
-             ;; patch agentsets
+
+  z-size       ;;epaisseur d'un passage piéton
+  echelle      ;;echelle du plan a 
+  SOUTH1       ;; identifiant de la première partie passage pietons au SUD 
+  SOUTH2       ;; identifiant de la seconde partie passage pietons au SUD 
+  EAST         ;; identifiant du passage pietons à l'EST
+  WEST         ;; identifiant du passage pietons à l'OUEST
+  NORTH        ;; identifiant du passage pietons au NORD
+  ;;;;; Les variables précédantes ne servent que pour générer un environnement "idéal"
+
+
+  ;; patch agentsets : definitions des différents ensembles de patches ayant des caractétistiques similaires.
+
   trottoirs    ;; patchset containing the patches that are trottoirs
   roads         ;; patchset containing the patches that are roads
   buildings     ;; patchset containing the patches that are building's blocks
@@ -55,13 +68,7 @@ globals
   zcolor       ;; zebra color
   rcolor       ;; road color
   Lcolors
-  z-size       ;;epaisseur d'un passage piéton
-  echelle      ;;echelle du plan a 
-  SOUTH1       ;; identifiant de la première partie passage pietons au SUD 
-  SOUTH2       ;; identifiant de la seconde partie passage pietons au SUD 
-  EAST         ;; identifiant du passage pietons à l'EST
-  WEST         ;; identifiant du passage pietons à l'OUEST
-  NORTH        ;; identifiant du passage pietons au NORD
+
   
   
                ;  bmpFilename  ;;file name of the background image
@@ -146,7 +153,7 @@ end
 ;; le croisemment ledru rollin/Faubourg SA.
 ;; c'est ici que sont déclarées les largeurs des trottoirs, des routes, etc.. En fonction de mesures faites TRES
 ;; approximativemment à partir du plan gracieusement imprimé par le service de l'urbanisme du XIe arrondissement de Paris
-;;
+;; DEPRECATED, en théorie ne devrait plus être utile/utilisé
 ;; 
 to initializeLedru
   set w [12 16 18 0 18 ]  
@@ -242,6 +249,8 @@ to setup-patches
   setup-lightLedru
   
 end
+
+
 to setup-patchesBmp
   ask patches [
     set zebra-id -1
@@ -260,6 +269,8 @@ to setup-patchesBmp
 end  
 
 
+;;;; 
+;; Utilisent les couleurs du fichier BMP pour definir les différents feux présent sur le carrefour
 to setup-lightBmp
   set lights patches with [ (item 0 pcolor) = 255 and ( (item 1 pcolor) = 0 or (item 1 pcolor) = 1 ) ] 
   ask lights [set light-id item 2 pcolor set zebra-id item 2 pcolor ]
@@ -268,6 +279,8 @@ to setup-lightBmp
   
 end
 
+;;;
+;; Utilise le fichier timing pour initialiser les temps d'alternance des feux
 to init-lightset
   let timeFilname  (word "../data/input/timing/" Name ".tm") 
   set lightset []
@@ -291,6 +304,8 @@ to init-lightset
 end
 
 
+;;;; 
+;; Utilisent les couleurs du fichier BMP pour definir les différents passages pétons présent sur le carrefour
 to setup-zebraBmp
     set zebra patches with [  (item 0 pcolor) = 255 and (item 1 pcolor) = 255 ]
 ;  ask zebra [ set proba probzeb]
@@ -1392,20 +1407,21 @@ String
 @#$#@#$#@
 WHAT IS IT?
 -----------
-This program will be used to test different models trying to explain how pedestrians act when they reach a crossway with where over pedestrian can appaers from metro exit, bus station and 
+This program will be used to test different models trying to explain how pedestrians act when they reach a crossway.
 
 
 HOW IT WORKS
 ------------
-The main idea is to simulate behavior which respect law and other which are able to more or less transgress laws and rules.
 
 An agent is able to see zebra pathways and at that precise moment he can know the state of each light around the zebra (lights which regulate pedestrian but also lights which regulate cars).
 
 At the time I write the agents move followings those rules :
 
 	he looks in front of himself to know what is the type of the patch ahead
-	 
-	he puts is heading to face his go which is randomly chosen when the agents is created
+
+	depending on the nature of the patch ahead the agent continue to go or he randomly turn left or right in order to avoid the obstacle. 
+ 
+	he change his heading to face his goal which is randomly chosen when the agents is created
 
 
 HOW TO USE IT
@@ -1415,32 +1431,30 @@ The user can also choose the path of a bmp image in order to use it as backgroun
 
 THINGS TO NOTICE
 ----------------
-This section could give some ideas of things for the user to notice while running the model.
+A lot of work remains to be done.
 
 
 THINGS TO TRY
 -------------
-This section could give some ideas of things for the user to try to do (move sliders, switches, etc.) with the model.
 
 
 EXTENDING THE MODEL
 -------------------
-This section could give some ideas of things to add or change in the procedures tab to make the model more complicated, detailed, accurate, etc.
 
 
 NETLOGO FEATURES
 ----------------
-This section could point out any especially interesting or unusual features of NetLogo that the model makes use of, particularly in the Procedures tab.  It might also point out places where workarounds were needed because of missing features.
 
 
 RELATED MODELS
 --------------
-This section could give the names of models in the NetLogo Models Library or elsewhere which are of related interest.
 
 
 CREDITS AND REFERENCES
 ----------------------
-This section could contain a reference to the model's URL on the web if it has one, as well as any other necessary credits or references.
+Le LUTIN, Alexandre Lacaste (alacaste@gmail.com) et Simon Carrignon (simon.carrignon@elisya.org) sont les principaux acteurs de ce projets, avec les toujours lumineuses idées de Charles Tijus.
+Toutes les erreurs présentent dans ce fichier incombent à Simon Carrignon et ne sauraient être attribuée au LUTIN.
+
 @#$#@#$#@
 default
 true
