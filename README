@@ -1,7 +1,11 @@
-Le dossier doc contient divers documents
-Le dossier data contient :
+PEDESTRIAN : projets de modelisation du comportement des pietons par approche agent centrée/mutli agents. 
+dernière version du readme, le 27 Aout 2008.
+contact simon.carrignon@elisya.org
+
+Le dossier doc/ contient divers documents informatifs en rapport avec le projet.
+Le dossier data/ contient :
 	1-Les résultats des simulations (en csv)
 	2-les plans des carrefours dans differents formats
-Les fichier .dwg (fichiers autocad) contenu dans "data" peuvent être lu avec draftSight quu'il faut installer (attention fichier propriétaire de dassault)
-le dossier bin contien divers executable/.deb etc.. pouvant être utilie
-le dossier src continent les soruces du modèle netlogo ainsi que de divers scripts utiles
+Les fichier .dwg (fichiers autocad) contenu dans "data" peuvent être lus sous linux avec draftSight qu'il faut installer (attention fichier propriétaire de Dassault)
+le dossier bin/ contien divers executable/.deb etc.. pouvant être utilie
+le dossier src/ continent les sources du modèle netlogo ainsi que de divers scripts utiles
