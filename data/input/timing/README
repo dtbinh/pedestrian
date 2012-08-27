@@ -1,6 +1,8 @@
-Les fichiers .tm décrivent les alternances des feux du carrefour. Sur chaque ligne est noté l'identifiant du feux ainsi que ces diférents temps de passage (pour un cycle de 70secondes)
+Les fichiers .tm décrivent les alternances des feux du carrefour. Sur chaque ligne est noté l'identifiant du feux ainsi que ses diférents temps de passage (pour un cycle de 70secondes)
 
 les fichiers .tm doivent avoir la syntax suivante :
 ID ON OR OFF
 1 23 25 35
+
+Ce qui veut dire que le feu num 1 passer au vert à la 23e seconde du cycle (de 70 sec) puis passe au orange 2 secondes après puis passe au rouge 10 secondes après.
 
