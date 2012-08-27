@@ -1,0 +1,5 @@
+pedestrian/.git/*
+*.csv
+pedestrian/data/output/*
+*.deb
+*.pdf
