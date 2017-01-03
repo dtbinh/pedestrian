@@ -2,6 +2,6 @@ Pour installer le programme il faut télécharger la version 4.1.3 de netlogo di
 
 Il faut aussi JAVA installer sur la machine pour le faire (tuto ici pourrait être utile).
 
-ensuite il faut charger le modèle qui est dans src/AUCRE.nlogo
+ensuite il faut charger le modèle qui est dans [src/AUCRE.nlogo](src/AUCRE.nlogo)
 
 

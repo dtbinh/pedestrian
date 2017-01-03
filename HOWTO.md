@@ -13,8 +13,8 @@ Si l'image ne se charge pas alors revoir les étapes 1 et 2
 4. Pour lancer la simulation, appuyer sur "GO".
 Si la simulation ne démarre pas, vérfier que avort est bien sur "off" (si avort est sur "on" cela veut dire que l'on veut "arrêter" la simulation. Ça peut sembler contre-intuitif, mais il y a une logique).
 
-5.La simulation durera tant que le nombre de "ticks" n'aura pas atteint "duration". Pour arrêter la simulation avabt il suffit de mettre le bouton "avort" sur "on".
+5. La simulation durera tant que le nombre de "ticks" n'aura pas atteint "duration". Pour arrêter la simulation avabt il suffit de mettre le bouton "avort" sur "on".
 
-6.Les résultats sont écrits dans un fichier texte dans data/output/modelOutputFiles/
+6. Les résultats sont écrits dans un fichier texte dans data/output/modelOutputFiles/
 
 7. Pour analyser les fichiers de sortie, des scripts sont disponibles dans script/
