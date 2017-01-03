@@ -1,16 +1,19 @@
-###### PEDESTRIAN #######b
+### PEDESTRIAN #######
 
-projets de modélisation du comportement des piétons par approche agent centrée/multi agents. 
+#projets de modélisation du comportement des piétons par approche agent centrée/multi agents.#
 
 > dernière version du readme, le 27 Aout 2008.
 > petites modifs en janvier 2017 après mail Hamid
-contact simon.carrignon@elisya.org
+
+
+**Contact:** simon.carrignon@elisya.org
 
 Pour lancer le model cf INSTALL, pour s'en servir et le modifier, cf: HOWTO
 
 ---
 
-Ce repository contient:
+######Ce repository contient:
+
 * Le dossier `doc/` contient divers documents informatifs en rapport avec le projet.
 * Le dossier data/ contient:
        * Les résultats des simulations (en csv)
